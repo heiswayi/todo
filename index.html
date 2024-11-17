@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+
+<title>//TODO:</title>
+
+<link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAE1SURBVHgB7ZdBDoIwEEWn6IJluQFLj+MNjCdQT6BbV8YTyA30RnID2LrCmRiVNMAMdLQs+IlJJe28z0wZigGhkiSpoIeKojCSeREE1txauzHGHHBsmyZI76RNHZnLq6o6RwjftsF/rBTZeypBCuFkw+8B94Jvzbl47p4YXwbapJ2Zt4JnYDKgbgA76wp3eoG/O46X3HxVAwTH7pbBq7NSp7twa9QM1OB1ldw6FQMtcMCXzY5byxqgOnbVtAO+LsvyxsVnDWDwE3xreiWgEJ6BQJJOaB1DGYI/Y/CAk9gMNNWRwBpwkQEKSIG5eUPgIgMSE0PhYgNdJnzgvQw4JnL66wsnGfeEIn3v45NgEc52OldqJ6Ih8CZN5wHT95tPW6MogcpmGqh8FsfxA/v6Av7/fUh95PgEIROb9L5bVT0AAAAASUVORK5CYII=">
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: system-ui, sans-serif;
+  line-height: 1;
+  font-size: .875rem;
+  background: #fff;
+  color: #000;
+  position: relative;
+}
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: stretch;
+  height: 100vh;
+  overflow: hidden;
+  gap: 10px;
+  padding: 10px;
+}
+.plan {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 10px;
+}
+.row {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 10px;
+}
+.notes {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: stretch;
+  border: 2px dashed transparent;
+}
+.heading {
+  padding-bottom: .5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  font-weight: bold;
+  padding: .5rem;
+  display: flex;
+  justify-content: space-between;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: .05em;
+}
+textarea {
+  flex: 1;
+  border: 0;
+  resize: none;
+  background: none;
+  font: inherit;
+  padding: .5rem;
+  line-height: 1.5em;
+  color: inherit;
+}
+textarea:focus {
+  outline: 0;
+}
+.day1 {
+  background: #223450;
+  color: #fff;
+}
+.day2 {
+  background: #ca4001;
+  color: #fff;
+}
+.day3 {
+  background: #ddbf50;
+  color: #000;
+}
+.day4 {
+  background: #499982;
+  color: #fff;
+}
+.day5 {
+  background: #417d64;
+  color: #fff;
+}
+.weekend {
+  background: #c5ab9a;
+  color: #000;
+}
+.month1 {
+  background: 	#ffe599;
+  color: #000;
+}
+.month2 {
+  background: #f9cb9c;
+  color: #000;
+}
+.notes:focus-within {
+  border-color: #000;
+}
+</style>
+
+</head>
+<body>
+
+<form class="container">
+  <div class="title">
+    <strong>//TODO:</strong> - The data will be automatically saved into your browser's <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage">Local Storage</a>.
+  </div>
+  <div class="plan">
+    <div class="row">
+      <div for="monday" class="notes day day1">
+        <span class="heading">Monday</span>
+        <textarea id="monday" spellcheck="false"></textarea>
+      </div>
+      <div for="tuesday" class="notes day day2">
+        <span class="heading">Tuesday</span>
+        <textarea id="tuesday" spellcheck="false"></textarea>
+      </div>
+      <div for="wednesday" class="notes day day3">
+        <span class="heading">Wednesday</span>
+        <textarea id="wednesday" spellcheck="false"></textarea>
+      </div>
+      <div for="thursday" class="notes day day4">
+        <span class="heading">Thursday</span>
+        <textarea id="thursday" spellcheck="false"></textarea>
+      </div>
+      <div for="friday" class="notes day day5">
+        <span class="heading">Friday</span>
+        <textarea id="friday" spellcheck="false"></textarea>
+      </div>
+      <div for="weekend" class="notes weekend">
+        <span class="heading">Weekend (Sat & Sun) 🎉🎈</span>
+        <textarea id="weekend" spellcheck="false"></textarea>
+      </div>
+    </div>
+    <div class="row">
+      <div for="this-month" class="notes month1">
+        <span class="heading">This month</span>
+        <textarea id="this-month" spellcheck="false"></textarea>
+      </div>
+      <div for="next-month" class="notes month2">
+        <span class="heading">Next month</span>
+        <textarea id="next-month" spellcheck="false"></textarea>
+      </div>
+    </div>
+  </div>
+</form>
+
+<script>
+const days  = Array.from(document.querySelectorAll(".day"));
+const notes = Array.from(document.querySelectorAll("textarea"));
+
+document.addEventListener("keydown", e => {
+  if (e.metaKey === true && e.key === "s") {
+    e.preventDefault();
+  }
+});
+
+function hightlightCurrentDay() {
+  if (document.visibilityState != 'visible') { return; }
+
+  var today = new Date();
+
+  days.forEach((day, index) => {
+    unhighlightDay(day);
+    if (index === today.getDay() - 1) {
+      highlightDay(day, today.getDate() + "/" + (today.getMonth() + 1));
+    }
+  });
+}
+
+function highlightDay(day, dateString) {
+  day.setAttribute("aria-current", "date");
+
+  let span = document.createElement("span");
+  span.innerHTML = dateString + " (Today)";
+
+  day.querySelector("textarea").setAttribute("autofocus", true);
+  day.querySelector("textarea").focus();
+  day.querySelector(".heading").append(span);
+}
+
+function unhighlightDay(day) {
+  day.removeAttribute("aria-current");
+  day.querySelector("textarea").removeAttribute("autofocus");
+  let existingSpan = day.querySelector(".heading > span");
+  if (existingSpan != null) { existingSpan.remove() }
+}
+
+hightlightCurrentDay();
+document.addEventListener('visibilitychange', hightlightCurrentDay);
+
+// handle note-taking
+notes.forEach(note => {
+  const id = note.id;
+
+  // get initial html
+  note.value = localStorage.getItem(id);
+
+  // save changes
+  note.addEventListener("input", e => {
+    localStorage.setItem(id, note.value);
+  });
+});
+</script>
+
+</body>
