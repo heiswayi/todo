@@ -16,36 +16,122 @@
 body {
   font-family: system-ui, sans-serif;
   line-height: 1;
-  font-size: .875rem;
-  background: #fff;
-  color: #000;
+  font-size: 0.95rem;
+  background: #f5f4f1;
+  color: #1a1a1a;
   position: relative;
 }
 .container {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: stretch;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
+  gap: 16px;
+  padding: 16px;
+}
+.title {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+.title-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+.title strong {
+  font-size: 1.2rem;
+  letter-spacing: 0.02em;
+}
+.title p {
+  font-size: 0.9rem;
+  color: #4a4a4a;
+}
+.controls {
+  display: flex;
+  flex-wrap: wrap;
   gap: 10px;
-  padding: 10px;
+}
+.control-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  background: #f6f5f2;
+  padding: 8px 10px;
+  border-radius: 999px;
+}
+.control-group span {
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #616161;
+}
+button {
+  border: 1px solid transparent;
+  background: #1a1a1a;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font: inherit;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+button.secondary {
+  background: #ffffff;
+  color: #1a1a1a;
+  border-color: #d8d8d8;
+}
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+button:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 2px;
+}
+.date-range {
+  font-size: 0.9rem;
+  color: #3a3a3a;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #eef8f0;
+  color: #25623b;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 .plan {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: stretch;
-  gap: 10px;
+  gap: 16px;
 }
 .row {
   flex: 1;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+  display: grid;
   align-items: stretch;
-  gap: 10px;
+  gap: 12px;
+}
+.row.week-grid {
+  grid-template-columns: repeat(6, minmax(140px, 1fr));
+}
+.row.month-grid {
+  grid-template-columns: repeat(2, minmax(240px, 1fr));
 }
 .notes {
   flex: 1;
@@ -53,14 +139,20 @@ body {
   flex-direction: column;
   justify-content: space-between;
   align-items: stretch;
-  border: 2px dashed transparent;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+  background: #fff;
 }
 .heading {
   padding-bottom: .5rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
   font-weight: bold;
   padding: .5rem;
   display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
   justify-content: space-between;
   text-transform: uppercase;
   font-size: 0.75rem;
@@ -75,6 +167,7 @@ textarea {
   padding: .5rem;
   line-height: 1.5em;
   color: inherit;
+  min-height: 150px;
 }
 textarea:focus {
   outline: 0;
@@ -114,6 +207,35 @@ textarea:focus {
 .notes:focus-within {
   border-color: #000;
 }
+.notes[aria-current="date"] {
+  border-color: #1a1a1a;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 1100px) {
+  .row.week-grid {
+    grid-template-columns: repeat(3, minmax(180px, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .container {
+    padding: 12px;
+  }
+  .row.week-grid,
+  .row.month-grid {
+    grid-template-columns: 1fr;
+  }
+  .control-group {
+    border-radius: 16px;
+  }
+  .notes {
+    min-height: 180px;
+  }
+  textarea {
+    min-height: 140px;
+  }
+}
 </style>
 
 </head>
@@ -121,41 +243,62 @@ textarea:focus {
 
 <form class="container">
   <div class="title">
-    <strong>//TODO:</strong> - Your data will be automatically saved using your browser's <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage">Local Storage</a>.
+    <div class="title-row">
+      <div>
+        <strong>//TODO:</strong>
+        <p>Plan your week and month. Your notes are saved locally for offline access.</p>
+      </div>
+      <div class="badge" aria-live="polite">Offline ready · Local Storage</div>
+    </div>
+    <div class="controls">
+      <div class="control-group" aria-label="Week navigation">
+        <span>Week</span>
+        <button type="button" id="prev-week" class="secondary">Prev</button>
+        <button type="button" id="today-week">This week</button>
+        <button type="button" id="next-week" class="secondary">Next</button>
+      </div>
+      <div class="control-group" aria-label="Month navigation">
+        <span>Month</span>
+        <button type="button" id="prev-month" class="secondary">Prev</button>
+        <button type="button" id="today-month">This month</button>
+        <button type="button" id="next-month" class="secondary">Next</button>
+      </div>
+      <div class="date-range" id="date-range"></div>
+    </div>
   </div>
   <div class="plan">
-    <div class="row">
-      <div for="monday" class="notes day day1">
+    <div class="row week-grid">
+      <div for="monday" class="notes day day1" data-day="monday">
         <span class="heading">Monday</span>
         <textarea id="monday" spellcheck="false"></textarea>
       </div>
-      <div for="tuesday" class="notes day day2">
+      <div for="tuesday" class="notes day day2" data-day="tuesday">
         <span class="heading">Tuesday</span>
         <textarea id="tuesday" spellcheck="false"></textarea>
       </div>
-      <div for="wednesday" class="notes day day3">
+      <div for="wednesday" class="notes day day3" data-day="wednesday">
         <span class="heading">Wednesday</span>
         <textarea id="wednesday" spellcheck="false"></textarea>
       </div>
-      <div for="thursday" class="notes day day4">
+      <div for="thursday" class="notes day day4" data-day="thursday">
         <span class="heading">Thursday</span>
         <textarea id="thursday" spellcheck="false"></textarea>
       </div>
-      <div for="friday" class="notes day day5">
+      <div for="friday" class="notes day day5" data-day="friday">
         <span class="heading">Friday</span>
         <textarea id="friday" spellcheck="false"></textarea>
       </div>
-      <div for="weekend" class="notes weekend">
+      <div for="weekend" class="notes weekend" data-day="weekend">
         <span class="heading">Weekend (Sat & Sun) 🎉🎈</span>
         <textarea id="weekend" spellcheck="false"></textarea>
       </div>
     </div>
-    <div class="row">
-      <div for="this-month" class="notes month1">
+    <div class="row month-grid">
+      <div for="this-month" class="notes month1" data-month="primary">
         <span class="heading">This month</span>
         <textarea id="this-month" spellcheck="false"></textarea>
       </div>
-      <div for="next-month" class="notes month2">
+      <div for="next-month" class="notes month2" data-month="secondary">
         <span class="heading">Next month</span>
         <textarea id="next-month" spellcheck="false"></textarea>
       </div>
@@ -164,8 +307,22 @@ textarea:focus {
 </form>
 
 <script>
-const days  = Array.from(document.querySelectorAll(".day"));
+const days = Array.from(document.querySelectorAll(".day"));
 const notes = Array.from(document.querySelectorAll("textarea"));
+const dateRange = document.getElementById("date-range");
+const weekButtons = {
+  prev: document.getElementById("prev-week"),
+  today: document.getElementById("today-week"),
+  next: document.getElementById("next-week")
+};
+const monthButtons = {
+  prev: document.getElementById("prev-month"),
+  today: document.getElementById("today-month"),
+  next: document.getElementById("next-month")
+};
+
+let weekOffset = 0;
+let monthOffset = 0;
 
 document.addEventListener("keydown", e => {
   if (e.metaKey === true && e.key === "s") {
@@ -176,12 +333,13 @@ document.addEventListener("keydown", e => {
 function hightlightCurrentDay() {
   if (document.visibilityState != 'visible') { return; }
 
-  var today = new Date();
+  const today = new Date();
 
   days.forEach((day, index) => {
     unhighlightDay(day);
-    if (index === today.getDay() - 1) {
-      highlightDay(day, today.getDate() + "/" + (today.getMonth() + 1));
+    if (weekOffset === 0 && index === today.getDay() - 1) {
+      const label = formatDate(today, "numeric");
+      highlightDay(day, label);
     }
   });
 }
@@ -189,36 +347,150 @@ function hightlightCurrentDay() {
 function highlightDay(day, dateString) {
   day.setAttribute("aria-current", "date");
 
-  let span = document.createElement("span");
-  span.innerHTML = dateString + " (Today)";
-
-  day.querySelector("textarea").setAttribute("autofocus", true);
-  day.querySelector("textarea").focus();
+  const span = document.createElement("span");
+  span.innerHTML = `${dateString} (Today)`;
   day.querySelector(".heading").append(span);
 }
 
 function unhighlightDay(day) {
   day.removeAttribute("aria-current");
-  day.querySelector("textarea").removeAttribute("autofocus");
-  let existingSpan = day.querySelector(".heading > span");
+  const existingSpan = day.querySelector(".heading > span");
   if (existingSpan != null) { existingSpan.remove() }
 }
 
-hightlightCurrentDay();
-document.addEventListener('visibilitychange', hightlightCurrentDay);
+function formatDate(date, style = "short") {
+  return new Intl.DateTimeFormat(undefined, {
+    month: style === "numeric" ? "numeric" : "short",
+    day: "numeric"
+  }).format(date);
+}
 
-// handle note-taking
-notes.forEach(note => {
-  const id = note.id;
+function formatMonth(date) {
+  return new Intl.DateTimeFormat(undefined, { month: "long", year: "numeric" }).format(date);
+}
 
-  // get initial html
-  note.value = localStorage.getItem(id);
+function startOfWeek(date) {
+  const day = date.getDay();
+  const diff = (day === 0 ? -6 : 1) - day;
+  const start = new Date(date);
+  start.setDate(date.getDate() + diff);
+  start.setHours(0, 0, 0, 0);
+  return start;
+}
 
-  // save changes
-  note.addEventListener("input", e => {
-    localStorage.setItem(id, note.value);
+function getWeekKey(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+function getMonthKey(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function updateWeekHeadings(weekStart) {
+  const labels = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Weekend (Sat & Sun) 🎉🎈"];
+  const headingDates = [];
+
+  days.forEach((day, index) => {
+    const heading = day.querySelector(".heading");
+    heading.textContent = labels[index];
+    if (index < 5) {
+      const date = new Date(weekStart);
+      date.setDate(weekStart.getDate() + index);
+      headingDates.push(date);
+      const span = document.createElement("span");
+      span.textContent = formatDate(date);
+      heading.append(span);
+    } else {
+      const saturday = new Date(weekStart);
+      saturday.setDate(weekStart.getDate() + 5);
+      const sunday = new Date(weekStart);
+      sunday.setDate(weekStart.getDate() + 6);
+      headingDates.push(saturday, sunday);
+      const span = document.createElement("span");
+      span.textContent = `${formatDate(saturday)} - ${formatDate(sunday)}`;
+      heading.append(span);
+    }
   });
+
+  const endOfWeek = new Date(weekStart);
+  endOfWeek.setDate(weekStart.getDate() + 6);
+  dateRange.textContent = `${formatDate(weekStart)} – ${formatDate(endOfWeek)} | ${formatMonth(weekStart)}`;
+}
+
+function updateMonthHeadings(baseMonth) {
+  const monthPanels = document.querySelectorAll("[data-month]");
+  monthPanels.forEach(panel => {
+    const heading = panel.querySelector(".heading");
+    if (panel.dataset.month === "primary") {
+      heading.textContent = formatMonth(baseMonth);
+    } else {
+      const nextMonth = new Date(baseMonth);
+      nextMonth.setMonth(baseMonth.getMonth() + 1);
+      heading.textContent = formatMonth(nextMonth);
+    }
+  });
+}
+
+function storageKey(id, weekStart, monthBase) {
+  if (["this-month", "next-month"].includes(id)) {
+    const monthKey = id === "this-month" ? getMonthKey(monthBase) : getMonthKey(new Date(monthBase.getFullYear(), monthBase.getMonth() + 1, 1));
+    return `todo:${id}:${monthKey}`;
+  }
+  return `todo:${id}:${getWeekKey(weekStart)}`;
+}
+
+function updateNotes(weekStart, monthBase) {
+  notes.forEach(note => {
+    const key = storageKey(note.id, weekStart, monthBase);
+    note.value = localStorage.getItem(key) || "";
+    note.oninput = () => {
+      localStorage.setItem(key, note.value);
+    };
+  });
+}
+
+function refreshView() {
+  const today = new Date();
+  const weekAnchor = new Date(today);
+  weekAnchor.setDate(today.getDate() + weekOffset * 7);
+  const weekStart = startOfWeek(weekAnchor);
+
+  const monthBase = new Date(today.getFullYear(), today.getMonth() + monthOffset, 1);
+
+  updateWeekHeadings(weekStart);
+  updateMonthHeadings(monthBase);
+  updateNotes(weekStart, monthBase);
+  hightlightCurrentDay();
+}
+
+weekButtons.prev.addEventListener("click", () => {
+  weekOffset -= 1;
+  refreshView();
 });
+weekButtons.next.addEventListener("click", () => {
+  weekOffset += 1;
+  refreshView();
+});
+weekButtons.today.addEventListener("click", () => {
+  weekOffset = 0;
+  refreshView();
+});
+
+monthButtons.prev.addEventListener("click", () => {
+  monthOffset -= 1;
+  refreshView();
+});
+monthButtons.next.addEventListener("click", () => {
+  monthOffset += 1;
+  refreshView();
+});
+monthButtons.today.addEventListener("click", () => {
+  monthOffset = 0;
+  refreshView();
+});
+
+refreshView();
+document.addEventListener('visibilitychange', hightlightCurrentDay);
 </script>
 
 </body>
